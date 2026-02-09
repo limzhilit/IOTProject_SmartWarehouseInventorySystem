@@ -1,24 +1,17 @@
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
-# Choose a dictionary of markers
-aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)  # 4x4 markers, 50 unique IDs
+# Define the dictionary we want to use
+aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
 
-marker_id = 0  # ID of the marker to generate (0-49 in this dictionary)
-marker_size = 200  # pixels
+# Generate a marker
+marker_id = 42
+marker_size = 200  # Size in pixels
+marker_image = cv2.aruco.generateImageMarker(aruco_dict, marker_id, marker_size)
 
-# Generate marker image
-marker_img = np.zeros((marker_size, marker_size), dtype=np.uint8)
-if hasattr(cv2.aruco, "generateImageMarker"):
-    cv2.aruco.generateImageMarker(aruco_dict, marker_id, marker_size, marker_img, 1)
-else:
-    marker_img = cv2.aruco.drawMarker(aruco_dict, marker_id, marker_size, marker_img, 1)
-
-# Save to file
-cv2.imwrite(f"aruco_{marker_id}.png", marker_img)
-print(f"Saved marker as aruco_{marker_id}.png")
-
-# Optional: show marker
-cv2.imshow("ArUco Marker", marker_img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+cv2.imwrite('marker_42.png', marker_image)
+plt.imshow(marker_image, cmap='gray', interpolation='nearest')
+plt.axis('off')  # Hide axes
+plt.title(f'ArUco Marker {marker_id}')
+plt.show()
