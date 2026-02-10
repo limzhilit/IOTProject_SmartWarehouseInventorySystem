@@ -45,3 +45,23 @@ function startEditRow(index) {
   // Cancel editing
   actions.querySelector(".cancel").addEventListener("click", renderTable);
 }
+
+// ==========================
+// SECURITY HELPERS (XSS SAFE)
+// ==========================
+
+function escapeHtml(s) {
+  return (s || "").replace(/[&<>"']/g, c =>
+  ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[c])
+  );
+}
+
+function escapeAttr(s) {
+  return escapeHtml(s).replace(/"/g, '&quot;');
+}
