@@ -15,23 +15,26 @@ resetAssignUI();
 // ==========================
 // ASSIGN ITEM TO CARD
 // ==========================
-
-async function assign() {
+function assign() {
   const itemName = document.getElementById("assignInput").value;
 
   if (itemName && itemName.trim() !== "") {
-    // Send item name to ESP32
-    const res = await fetch(
-      `/assign?item=${encodeURIComponent(itemName.substring(0, 16))}`
-    );
-    const msg = await res.text();
-    alert(msg);
-    resetAssignUI();
+    fetch(`/assign?item=${encodeURIComponent(itemName.substring(0, 16))}`)
+      .then(res => res.text())
+      .then(msg => {
+        alert(msg);
+        resetAssignUI();
+      })
+      .catch(err => {
+        console.error("Assign failed:", err);
+        resetAssignUI();
+      });
   } else {
     alert("Assignment cancelled (no name provided).");
     resetAssignUI();
   }
 }
+
 
 // ==========================
 // CHARACTER COUNTER
@@ -47,11 +50,12 @@ assignInput.addEventListener("input", () => {
   charCount.style.color = length === maxLen ? "red" : "gray";
 });
 
+
 // ==========================
 // WAIT FOR CARD
 // ==========================
 
-async function assignCard() {
+function assignCard() {
   let assignCancelled = false;
 
   // Update UI
@@ -59,33 +63,49 @@ async function assignCard() {
   document.getElementById("waiting").style.display = "block";
   document.getElementById("cancel").style.display = "block";
 
-  document.getElementById("cancel").addEventListener("click", () => {
+  const cancelBtn = document.getElementById("cancel");
+
+  const onCancel = () => {
     assignCancelled = true;
     resetAssignUI();
-  });
+  };
 
-  if (assignCancelled) return;
+  cancelBtn.addEventListener("click", onCancel);
 
-  const waitResponse = await fetch("/waitForCard");
-  const waitText = await waitResponse.text();
+  fetch("/waitForCard")
+    .then(waitResponse => waitResponse.text())
+    .then(waitText => {
+      if (assignCancelled) return;
 
-  if (waitText.includes("detected")) {
-    // Card detected → ask for name
-    document.getElementById("assign").style.display = "block";
-    document.getElementById("waiting").style.display = "none";
-    document.getElementById("getName").style.display = "block";
+      if (waitText.includes("detected")) {
+        // Card detected → ask for name
+        document.getElementById("assign").style.display = "block";
+        document.getElementById("waiting").style.display = "none";
+        document.getElementById("getName").style.display = "block";
 
-    document.getElementById("assign").addEventListener("click", assign);
-  } else {
-    // No card detected
-    document.getElementById("cancel").style.display = "none";
-    document.getElementById("waiting").textContent = "No card detected.";
+        document
+          .getElementById("assign")
+          .addEventListener("click", assign);
+      } else {
+        // No card detected
+        document.getElementById("cancel").style.display = "none";
+        document.getElementById("waiting").textContent = "No card detected.";
 
-    setTimeout(() => {
+        setTimeout(() => {
+          resetAssignUI();
+          document.getElementById("waiting").textContent =
+            "Waiting for card...";
+        }, 3000);
+      }
+    })
+    .catch(err => {
+      console.error("Wait for card failed:", err);
       resetAssignUI();
-      document.getElementById("waiting").textContent = "Waiting for card...";
-    }, 3000);
-  }
+    })
+    .finally(() => {
+      cancelBtn.removeEventListener("click", onCancel);
+    });
 }
+
 
 document.getElementById("assignCardBtn").addEventListener("click", assignCard);

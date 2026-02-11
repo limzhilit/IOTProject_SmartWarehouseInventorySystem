@@ -4,7 +4,7 @@
 
 function fetchTempHum() {
   fetch("/temphum")
-    .then(res => res.json())
+    .then(response => response.json())
     .then(data => {
       document.getElementById("temp").textContent = data.temperature;
       document.getElementById("hum").textContent = data.humidity;
