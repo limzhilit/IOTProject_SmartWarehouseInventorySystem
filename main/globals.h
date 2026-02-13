@@ -2,7 +2,8 @@
 
 #include <WiFi.h>
 #include <NetworkClient.h>
-#include <WebServer.h>
+#include <ESPAsyncWebServer.h> // Change from <WebServer.h>
+#include <WebSocketsServer.h>
 #include <ESPmDNS.h>
 #include "DHT.h"
 #include <Wire.h>
@@ -21,6 +22,6 @@
 #define led 13
 
 
-extern WebServer server;
+extern AsyncWebServer server;
 extern Adafruit_PN532 nfc;
 extern DHT dht;

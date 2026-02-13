@@ -14,6 +14,9 @@
       <li><a href="#" class="active">Home</a></li>
       <li><a href="/rover">Rover</a></li>
     </ul>
+    <button id="themeToggle" aria-label="Toggle theme">
+      <span id="themeIcon"></span>
+    </button>
   </nav>
   <h1>Smart Warehouse Inventory System </h1>
   <table id="statusTable">
@@ -36,10 +39,10 @@
   <table id="itemTable">
     <thead>
       <tr>
-        <th style="width: 6%;">#</th>
-        <th style="width: 40%;"> Item</th>
-        <th style="width: 20%;">Quantity</th>
-        <th style="width: 33%;">Actions</th>
+        <th>#</th>
+        <th>Item</th>
+        <th>Quantity</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -53,7 +56,7 @@
     <p id="waiting" class="waiting">Please place your card on the reader<span class="dots"></span></p>
     <div id="getName">
       <input type="text" id="assignInput" placeholder="Enter item name" maxlength="16">
-      <small id="charCount" style="color:gray; margin-right: 10px;">0 / 16</small>
+      <small id="charCount">0 / 16</small>
     </div>
     <button id="assignCardBtn">Assign Card</button>
     <button id="assign" onClick="assign">Assign</button>
@@ -64,13 +67,10 @@
     <button id="addItemBtn">Add Item</button>
     <p id="waiting2" class="waiting">Please place your card on the reader<span class="dots"></span></p>
     <button id="cancel2">Cancel</button>
-
   </div>
 
-
+  <script src="/script/ThemeToggle.js"></script>
   <script src="/script/Table.js" defer></script>
-  <script src="/script/EditRow.js"></script>
-  <script src="/script/AddItem.js"></script>
   <script src="/script/AssignCard.js"></script>
   <script src="/script/TempHum.js"></script>
 

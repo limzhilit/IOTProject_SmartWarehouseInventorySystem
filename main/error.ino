@@ -96,8 +96,5 @@ String getDiagnosticsJSON() {
     return json;
 }
 
-// On your server endpoint
-server.on("/diagnostics", []() {
-    server.send(200, "application/json", getDiagnosticsJSON());
-});
+
 

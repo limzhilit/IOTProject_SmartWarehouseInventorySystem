@@ -1,6 +1,4 @@
-// ==========================
 // CARD ASSIGNMENT UI
-// ==========================
 
 function resetAssignUI() {
   document.getElementById("assignCardBtn").style.display = "block";
@@ -12,9 +10,7 @@ function resetAssignUI() {
 
 resetAssignUI();
 
-// ==========================
 // ASSIGN ITEM TO CARD
-// ==========================
 function assign() {
   const itemName = document.getElementById("assignInput").value;
 
@@ -36,10 +32,7 @@ function assign() {
 }
 
 
-// ==========================
 // CHARACTER COUNTER
-// ==========================
-
 const assignInput = document.getElementById("assignInput");
 const charCount = document.getElementById("charCount");
 const maxLen = assignInput.maxLength;
@@ -51,10 +44,7 @@ assignInput.addEventListener("input", () => {
 });
 
 
-// ==========================
 // WAIT FOR CARD
-// ==========================
-
 function assignCard() {
   let assignCancelled = false;
 
@@ -95,7 +85,7 @@ function assignCard() {
           resetAssignUI();
           document.getElementById("waiting").textContent =
             "Waiting for card...";
-        }, 3000);
+        }, 10000);
       }
     })
     .catch(err => {
@@ -106,6 +96,5 @@ function assignCard() {
       cancelBtn.removeEventListener("click", onCancel);
     });
 }
-
 
 document.getElementById("assignCardBtn").addEventListener("click", assignCard);

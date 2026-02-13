@@ -2,116 +2,72 @@
 
 bool waitingForCard = false;
 unsigned long cardStartTime;
-const unsigned long cardTimeout = 3000;
+const unsigned long cardTimeout = 10000;
 uint8_t uid[7];
 uint8_t uidLength;
 bool cardDetected = false;
 String lastCardUID = "";
 
-void handleAddItem() {
+// --- Updated handleAddItem ---
+void handleAddItem(AsyncWebServerRequest *request) {
   String itemName = rfid(0, "");
-  server.send(200, "text/plain", itemName);
+  request->send(200, "text/plain", itemName);
 }
 
 String rfid(int mode, String itemName) {
-
-  // 1️⃣ Check for card
   if (!nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength)) {
     Serial.println("ERROR: cannot read card");
     return "-1";
   }
 
-  Serial.println("Found a card");
-
-  // 2️⃣ Authenticate
   uint8_t keya[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
   if (!nfc.mifareclassic_AuthenticateBlock(uid, uidLength, 4, 0, keya)) {
-    Serial.println("Authentication failed");
     return "-1";
   }
 
-  Serial.println("Authenticated");
-
   uint8_t data[16] = {0};
-
-  // 3️⃣ Write (if mode == 1)
   if (mode == 1) {
     itemName.toCharArray((char*)data, 16);
     nfc.mifareclassic_WriteDataBlock(4, data);
   }
 
-  // 4️⃣ Read
   if (!nfc.mifareclassic_ReadDataBlock(4, data)) {
-    Serial.println("Read failed");
     return "-1";
   }
 
-  String text = String((char*)data);
-  Serial.println("Block 4 Data:");
-  Serial.println(text);
-
-  return text;
+  return String((char*)data);
 }
 
-
-void handleWaitForCard() {
+// --- Updated handleWaitForCard ---
+void handleWaitForCard(AsyncWebServerRequest *request) {
   Serial.println("Waiting for card...");
   waitingForCard = true;
   cardStartTime = millis();
+  request->send(200, "text/plain", "Waiting started");
 }
 
+// --- Updated checkCard (IMPORTANT) ---
 void checkCard() {
   if (!waitingForCard) return;
+
   if (nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength)) {
-    server.send(200, "text/plain", "detected");
+    // Instead of server.send, we use WebSocket to push data to the UI
+    webSocket.broadcastTXT("detected"); 
     waitingForCard = false;
-  } else if (millis() - cardStartTime >= cardTimeout) {
-    server.send(408, "text/plain", "timeout");
+  } 
+  else if (millis() - cardStartTime >= cardTimeout) {
+    webSocket.broadcastTXT("timeout");
     waitingForCard = false;
   }
 }
 
-void handleAssign() {
-  if (server.hasArg("item")) {
-    String itemName = server.arg("item");
+// --- Updated handleAssign ---
+void handleAssign(AsyncWebServerRequest *request) {
+  if (request->hasArg("item")) {
+    String itemName = request->arg("item");
     rfid(1, itemName);
-    server.send(200, "text/plain", "Card assigned: " + itemName);
+    request->send(200, "text/plain", "Card assigned: " + itemName);
   } else {
-    server.send(400, "text/plain", "Missing 'item' parameter");
+    request->send(400, "text/plain", "Missing 'item' parameter");
   }
 }
-
-
-// String rfid(int x, String itemName){
-//   if (nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength)) {
-//     Serial.println("Found a card");
-//     Serial.print("UID Value: ");
-//     nfc.PrintHex(uid, uidLength);
-//     Serial.println("Trying to authenticate block 4 with default KEYA value...");
-//     uint8_t keya[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-//     if (nfc.mifareclassic_AuthenticateBlock(uid, uidLength, 4, 0, keya)) {
-//       Serial.println("Sector 1 authenticated");
-//       uint8_t data[16];
-//       if (x == 1) {
-//         uint8_t data[16] = {0};
-//         itemName.toCharArray((char*)data, 16);
-//         nfc.mifareclassic_WriteDataBlock (4, data);
-//       }
-//       if (nfc.mifareclassic_ReadDataBlock(4, data)) {
-//         Serial.println("Reading Block 4:");
-//         nfc.PrintHexChar(data, 16);
-//         Serial.println("");
-//         String text = String((char*)data);
-//         Serial.println(text);   
-//         return text;
-//       }
-//       else {
-//         Serial.println("ERROR: unable to read the requested block");
-//       }
-//     } else {
-//       Serial.println("ERROR: authentication failed");
-//     }
-//   }
-//   return "-1";
-// }
-

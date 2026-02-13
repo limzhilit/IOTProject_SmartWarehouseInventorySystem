@@ -1,3 +1,25 @@
+/* Rover Page Variables */
+:root {
+  --radial-bg: black;
+  --radial-border: #ccc;
+  --knob-bg: lightblue;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --radial-bg: #000000;
+    --radial-border: #333;
+    --knob-bg: #5eb3d6;
+  }
+}
+
+/* Manual Dark Mode Override */
+body.dark-mode {
+  --radial-bg: #000000;
+  --radial-border: #333;
+  --knob-bg: #5eb3d6;
+}
+
 #controller {
   display: flex;
   justify-content: center;
@@ -7,8 +29,8 @@
 #radial {
   width: 300px;
   height: 300px;
-  background-color: black;
-  border: 2px solid #ccc;
+  background-color: var(--radial-bg);
+  border: 2px solid var(--radial-border);
   border-radius: 50%;
   position: relative;
 }
@@ -16,7 +38,7 @@
 #knob {
   width: 40px;
   height: 40px;
-  background-color: lightblue;
+  background-color: var(--knob-bg);
   border-radius: 50%;
   position: absolute;
   top: 50%;

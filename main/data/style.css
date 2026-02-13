@@ -1,8 +1,118 @@
+/* CSS Variables for Light Mode */
+:root {
+  --bg-primary: #f9f9f9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f5f5f5;
+  --bg-nav: rgba(238, 238, 238, 0.7);
+  --bg-nav-active: rgba(255, 255, 255, 0.8);
+  --bg-nav-hover: rgba(255, 255, 255, 0.5);
+  --bg-button: rgba(255, 255, 255, 0.7);
+  --bg-button-hover: rgba(255, 255, 255, 0.8);
+
+  --text-primary: #333;
+  --text-secondary: #555;
+  --text-tertiary: gray;
+  --text-button: rgb(0, 0, 0);
+  --text-heading: #333;
+
+  --border-light: rgba(224, 224, 224, 0.5);
+  --border-medium: rgba(221, 221, 221, 0.6);
+  --border-dark: rgba(204, 204, 204, 0.7);
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(180, 180, 180, 0.2);
+  --shadow-focus: 0 0 0 2px rgba(85, 85, 85, 0.1);
+}
+
+/* Dark Mode Variables */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-tertiary: #1a1a1a;
+    --bg-nav: rgba(51, 51, 51, 0.6);
+    --bg-nav-active: rgba(68, 68, 68, 0.8);
+    --bg-nav-hover: rgba(68, 68, 68, 0.5);
+    --bg-button: rgba(51, 51, 51, 0.6);
+    --bg-button-hover: rgba(68, 68, 68, 0.8);
+
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #888;
+    --text-button: #ffffff;
+    --text-heading: #ffffff;
+
+    --border-light: rgba(255, 255, 255, 0.1);
+    --border-medium: rgba(255, 255, 255, 0.15);
+    --border-dark: rgba(255, 255, 255, 0.2);
+
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7);
+    --shadow-focus: 0 0 0 2px rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Manual Dark Mode Override - has higher specificity than media query */
+body.dark-mode {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #1a1a1a;
+  --bg-nav: rgba(51, 51, 51, 0.6);
+  --bg-nav-active: rgba(68, 68, 68, 0.8);
+  --bg-nav-hover: rgba(68, 68, 68, 0.5);
+  --bg-button: rgba(51, 51, 51, 0.6);
+  --bg-button-hover: rgba(68, 68, 68, 0.8);
+
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #888;
+  --text-button: #ffffff;
+  --text-heading: #ffffff;
+
+  --border-light: rgba(255, 255, 255, 0.1);
+  --border-medium: rgba(255, 255, 255, 0.15);
+  --border-dark: rgba(255, 255, 255, 0.2);
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7);
+  --shadow-focus: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Force Light Mode when not in dark mode */
+body:not(.dark-mode) {
+  --bg-primary: #f9f9f9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f5f5f5;
+  --bg-nav: rgba(238, 238, 238, 0.7);
+  --bg-nav-active: rgba(255, 255, 255, 0.8);
+  --bg-nav-hover: rgba(255, 255, 255, 0.5);
+  --bg-button: rgba(255, 255, 255, 0.7);
+  --bg-button-hover: rgba(255, 255, 255, 0.8);
+
+  --text-primary: #333;
+  --text-secondary: #555;
+  --text-tertiary: gray;
+  --text-button: rgb(0, 0, 0);
+  --text-heading: #333;
+
+  --border-light: rgba(224, 224, 224, 0.5);
+  --border-medium: rgba(221, 221, 221, 0.6);
+  --border-dark: rgba(204, 204, 204, 0.7);
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(180, 180, 180, 0.2);
+  --shadow-focus: 0 0 0 2px rgba(85, 85, 85, 0.1);
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   padding: 5px 10px;
-  background-color: #f9f9f9;
-  color: #333;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   max-width: 1000px;
   margin: auto;
 }
@@ -10,7 +120,43 @@ body {
 nav {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin-top: 20px;
+  position: relative;
+}
+
+/* Theme Toggle Button */
+#themeToggle {
+  position: absolute;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--bg-nav);
+  border: 2px solid var(--border-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  padding: 0;
+  margin: 0;
+}
+
+#themeToggle:hover {
+  background-color: var(--bg-nav-active);
+  transform: rotate(15deg) scale(1.1);
+}
+
+#themeToggle:active {
+  transform: rotate(15deg) scale(0.95);
+}
+
+#themeToggle svg {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 nav ul {
@@ -18,13 +164,13 @@ nav ul {
   padding: 10px 6px;
   margin: 5px;
   display: inline-flex;
-  background-color: #eee;
+  background-color: var(--bg-nav);
   border-radius: 90px;
 }
 
 nav a {
   text-decoration: none;
-  color: #555;
+  color: var(--text-secondary);
   padding: 6px 10px;
   border-radius: 90px;
   transition: all 0.3s ease;
@@ -32,65 +178,151 @@ nav a {
 }
 
 nav a.active {
-  background-color: #fff;
-  color: #000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-nav-active);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
 }
 
 nav a:hover:not(.active) {
-  color: #000;
-  background-color: rgba(255, 255, 255, 0.5);
+  color: var(--text-primary);
+  background-color: var(--bg-nav-hover);
 }
 
 h1 {
   text-align: center;
   margin-bottom: 2rem;
-  font-size: medium;
-  padding-top: 0px;
   font-size: 2rem;
+  color: var(--text-heading);
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin-bottom: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-secondary);
 }
 
 th,
 td {
-  border: 1px solid #ccc;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   text-align: left;
+  border-bottom: 1px solid var(--border-light);
 }
 
 th {
-  background-color: #eee;
+  background-color: var(--bg-tertiary);
+  font-weight: 600;
+  color: var(--text-heading);
+  border-bottom: 2px solid var(--border-light);
 }
 
-input,
-button {
-  padding: 0.4rem 0.8rem;
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+
+input {
+  padding: 0.6rem 0.9rem;
   margin-right: 0.5rem;
   margin-top: 0.5rem;
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  text-align: center;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+input:focus {
+  outline: none;
+  outline-style: none;
+  outline-width: 0;
+  border: 1px solid var(--border-medium);
+  box-shadow: var(--shadow-focus);
 }
 
 button {
+  padding: 0.6rem 1.2rem;
+  margin-right: 0.5rem;
+  margin-top: 0.5rem;
   cursor: pointer;
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  background-color: var(--bg-nav);
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  z-index: 10;
 }
 
-#statusTable thead tr th,
-#statusTable tbody tr td {
+button:hover {
+  box-shadow: var(--shadow-md);
+  transform: scale(1.05);
+  background-color: var(--bg-nav-active);
+}
+
+button:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Status Table: Fixed width columns (Error, Temp, Humidity) */
+#statusTable {
+  table-layout: fixed;
+}
+
+#statusTable th,
+#statusTable td {
   width: 33%;
   text-align: center;
 }
 
-#itemTable thead tr th,
-#itemTable tbody tr td {
+/* Item Table: Fixed width columns to prevent expansion */
+#itemTable {
+  table-layout: fixed;
+}
+
+#itemTable th:nth-child(1),
+#itemTable td:nth-child(1) {
+  width: 6%;
+  /* # column */
+}
+
+#itemTable th:nth-child(2),
+#itemTable td:nth-child(2) {
+  width: 40%;
+  /* Item name */
+}
+
+#itemTable th:nth-child(3),
+#itemTable td:nth-child(3) {
+  width: 20%;
+  /* Quantity */
+}
+
+#itemTable th:nth-child(4),
+#itemTable td:nth-child(4) {
+  width: 33%;
+  /* Actions */
+}
+
+#itemTable th,
+#itemTable td {
   text-align: center;
 }
 
 .waiting {
-  color: #333;
+  color: var(--text-primary);
   margin-right: 10px;
   width: 300px;
 }
@@ -146,4 +378,9 @@ button {
 #addItemBtn,
 #assignCardBtn {
   width: 150px;
+}
+
+#charCount {
+  color: var(--text-tertiary);
+  margin-right: 10px;
 }

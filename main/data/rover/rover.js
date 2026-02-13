@@ -10,9 +10,6 @@ const RADIUS = 150;      // half of radial size (200px)
 const KNOB_RADIUS = 20;  // half of knob size (40px)
 const MAX_DIST = RADIUS - KNOB_RADIUS;
 
-// ------------------------
-// Event Listeners
-// ------------------------
 knob.addEventListener("mousedown", startDrag);
 knob.addEventListener("touchstart", startDrag);
 
@@ -22,9 +19,6 @@ document.addEventListener("touchend", endDrag);
 document.addEventListener("mousemove", handleDrag);
 document.addEventListener("touchmove", handleDrag);
 
-// ------------------------
-// Functions
-// ------------------------
 function startDrag(e) {
   dragging = true;
   e.preventDefault(); // prevent text selection or scrolling
@@ -47,14 +41,14 @@ function resetKnob() {
   knob.style.top = "50%";
 }
 
-function sendToRover(direction, speed) {
-  const now = Date.now();
-  if (now - lastSend < SEND_INTERVAL) return;
+let ws = new WebSocket("ws://" + location.hostname + ":81/");
 
-  fetch(`/handleRover?direction=${direction}&speed=${speed}`)
-    .catch(err => console.error("ESP error:", err));
+ws.onopen = () => {
+  console.log("Connected");
+};
 
-  lastSend = now;
+function sendData(dir, spd) {
+  ws.send(dir + "," + spd);
 }
 
 function handleDrag(e) {
@@ -94,10 +88,9 @@ function handleDrag(e) {
   document.getElementById("speedDisplay").textContent = Math.round(distance / 255 * 100);
 
   console.log(`Degrees: ${degrees.toFixed(2)}, Distance: ${distance.toFixed(2)}`);
-  sendToRover(degrees, distance);
+  sendData(degrees, distance);
 }
 
-// Optional: fetch the index page
 function fetchIndex() {
   fetch("/").catch(err => console.error(err));
 }
