@@ -1,182 +1,89 @@
 #include "globals.h"
 
-void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+void handleRover(JsonDocument &doc) {
+  int temp = doc["dir"] | 0;  // default 0 if missing
+  int spd = doc["spd"] | 0;
 
-  if (type == WStype_TEXT) {
-
-    String message = String((char*)payload);
-
-    Serial.println("Received: " + message);
-
-    // Expect format: direction,speed
-    int commaIndex = message.indexOf(',');
-    if (commaIndex == -1) return;
-
-    int temp = message.substring(0, commaIndex).toInt();
-    int spd  = message.substring(commaIndex + 1).toInt();
-
-    controlRover(temp, spd);
-  }
+  Serial.println("Dir: " + String(temp) + " Spd: " + String(spd));
+  controlRover(temp, spd);
 }
 
+// Rover control function
 void controlRover(int temp, int spd) {
-
   int sector = (temp / 45) + 1;
   float angle = temp % 45;
 
-  switch(sector) {
-    case 1:
-      digitalWrite(M1,HIGH);
-      digitalWrite(M2,HIGH);
-      analogWrite(E1, spd);
-      analogWrite(E2, (int)(45 - angle)*spd/45);
-      Serial.printf("case 1 | M1: HIGH, M2: HIGH | E1: %d, E2: %d | angle: %.2f\n", spd, (int)((45 - angle)*spd/45), angle);
-      break;
-
-    case 2:
-      digitalWrite(M1,HIGH);
-      digitalWrite(M2,LOW);
-      analogWrite(E1, spd);
-      analogWrite(E2, (int)(angle)*spd/45);
-      Serial.printf("case 2 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", spd, (int)((45 - angle)*spd/45), angle);
-      break;
-
-    case 3:
-      digitalWrite(M1,HIGH);
-      digitalWrite(M2,LOW);
-      analogWrite(E1, (int)(45 - angle)*spd/45);
-      analogWrite(E2, spd);
-      Serial.printf("case 3 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", (int)((45 - angle)*spd/45), spd, angle);
-      break;
-
-    case 4:
-      digitalWrite(M1,HIGH);
-      digitalWrite(M2,LOW);
-      analogWrite(E1, (int)(angle)*spd/45);
-      analogWrite(E2, spd);
-      Serial.printf("case 4 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", (int)((45 - angle)*spd/45), spd, angle);
-      break;
-
-    case 5:
-      digitalWrite(M1,LOW);
-      digitalWrite(M2,LOW);
-      analogWrite(E1, (int)(45 - angle)*spd/45);
-      analogWrite(E2, spd);
-      Serial.printf("case 5 | M1: LOW, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", (int)((45 - angle)*spd/45), spd, angle);
-      break;
-
-    case 6:
-      digitalWrite(M1,LOW);
-      digitalWrite(M2,HIGH);
-      analogWrite(E1, spd);
-      analogWrite(E2, (int)(angle)*spd/45);
-      Serial.printf("case 6 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", spd, (int)((45 - angle)*spd/45), angle);
-      break;
-
-    case 7:
-      digitalWrite(M1,LOW);
-      digitalWrite(M2,HIGH);
-      analogWrite(E1, spd);
-      analogWrite(E2, (int)(45 - angle)*spd/45);
-      Serial.printf("case 7 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", spd, (int)((45 - angle)*spd/45), angle);
-      break;
-
-    case 8:
-      digitalWrite(M1,HIGH);
-      digitalWrite(M2,HIGH);
-      analogWrite(E1, spd);
-      analogWrite(E2, (int)(angle)*spd/45);
-      Serial.printf("case 8 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", spd, (int)((45 - angle)*spd/45), angle);
-      break;
-
-    default:
-      Serial.printf("Error for direction | sector: %d | angle: %.2f\n", sector, angle);
+  if (spd <= 0) {  // deadzone
+    digitalWrite(M1, LOW);
+    digitalWrite(M2, LOW);
+    analogWrite(E1, 0);
+    analogWrite(E2, 0);
+    Serial.println("Stopping motors");
+    return;
   }
+
+  int e1Val = 0, e2Val = 0;
+
+
+  switch (sector) {
+    case 1:
+      digitalWrite(M1, HIGH);
+      digitalWrite(M2, HIGH);
+      e1Val = spd;
+      e2Val = (int)((45 - angle) * spd / 45);
+      break;
+    case 2:
+      digitalWrite(M1, HIGH);
+      digitalWrite(M2, LOW);
+      e1Val = spd;
+      e2Val = (int)(angle * spd / 45);
+      break;
+    case 3:
+      digitalWrite(M1, HIGH);
+      digitalWrite(M2, LOW);
+      e1Val = (int)((45 - angle) * spd / 45);
+      e2Val = spd;
+      break;
+    case 4:
+      digitalWrite(M1, HIGH);
+      digitalWrite(M2, LOW);
+      e1Val = (int)(angle * spd / 45);
+      e2Val = spd;
+      break;
+    case 5:
+      digitalWrite(M1, LOW);
+      digitalWrite(M2, LOW);
+      e1Val = (int)((45 - angle) * spd / 45);
+      e2Val = spd;
+      break;
+    case 6:
+      digitalWrite(M1, LOW);
+      digitalWrite(M2, HIGH);
+      e1Val = spd;
+      e2Val = (int)(angle * spd / 45);
+      break;
+    case 7:
+      digitalWrite(M1, LOW);
+      digitalWrite(M2, HIGH);
+      e1Val = spd;
+      e2Val = (int)((45 - angle) * spd / 45);
+      break;
+    case 8:
+      digitalWrite(M1, HIGH);
+      digitalWrite(M2, HIGH);
+      e1Val = spd;
+      e2Val = (int)(angle * spd / 45);
+      break;
+    default:
+      Serial.printf("Error: invalid sector %d\n", sector);
+      return;
+  }
+
+  analogWrite(E1, e1Val);
+  analogWrite(E2, e2Val);
+
+  Serial.printf("Sector: %d | Angle: %.2f | M1:%d M2:%d | E1:%d E2:%d\n",
+                sector, angle,
+                digitalRead(M1), digitalRead(M2),
+                e1Val, e2Val);
 }
-
-
-// void handleRover() {
-
-//   String direction = server.arg("direction");
-//   String speed = server.arg("speed");
-
-//   int temp = direction.toInt();
-//   int spd = speed.toInt();
-
-//   Serial.printf("dir: %d  spd: %d\n", temp , spd);
-
-//   int sector = (temp/45) + 1;
-//   float angle = temp % 45;
-
-//   Serial.printf("sector: %d  angle: %.2f\n", sector , angle);
-
-//   switch(sector) {
-//     case 1:
-//       digitalWrite(M1,HIGH);
-//       digitalWrite(M2,HIGH);
-//       analogWrite(E1, spd);
-//       analogWrite(E2, (int)(45 - angle)*spd/45);
-//       Serial.printf("case 1 | M1: HIGH, M2: HIGH | E1: %d, E2: %d | angle: %.2f\n", spd, (int)((45 - angle)*spd/45), angle);
-//       break;
-
-//     case 2:
-//       digitalWrite(M1,HIGH);
-//       digitalWrite(M2,LOW);
-//       analogWrite(E1, spd);
-//       analogWrite(E2, (int)(angle)*spd/45);
-//       Serial.printf("case 2 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", spd, (int)((45 - angle)*spd/45), angle);
-//       break;
-
-//     case 3:
-//       digitalWrite(M1,HIGH);
-//       digitalWrite(M2,LOW);
-//       analogWrite(E1, (int)(45 - angle)*spd/45);
-//       analogWrite(E2, spd);
-//       Serial.printf("case 3 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", (int)((45 - angle)*spd/45), spd, angle);
-//       break;
-
-//     case 4:
-//       digitalWrite(M1,HIGH);
-//       digitalWrite(M2,LOW);
-//       analogWrite(E1, (int)(angle)*spd/45);
-//       analogWrite(E2, spd);
-//       Serial.printf("case 4 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", (int)((45 - angle)*spd/45), spd, angle);
-//       break;
-
-//     case 5:
-//       digitalWrite(M1,LOW);
-//       digitalWrite(M2,LOW);
-//       analogWrite(E1, (int)(45 - angle)*spd/45);
-//       analogWrite(E2, spd);
-//       Serial.printf("case 5 | M1: LOW, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", (int)((45 - angle)*spd/45), spd, angle);
-//       break;
-
-//     case 6:
-//       digitalWrite(M1,LOW);
-//       digitalWrite(M2,HIGH);
-//       analogWrite(E1, spd);
-//       analogWrite(E2, (int)(angle)*spd/45);
-//       Serial.printf("case 6 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", spd, (int)((45 - angle)*spd/45), angle);
-//       break;
-
-//     case 7:
-//       digitalWrite(M1,LOW);
-//       digitalWrite(M2,HIGH);
-//       analogWrite(E1, spd);
-//       analogWrite(E2, (int)(45 - angle)*spd/45);
-//       Serial.printf("case 7 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", spd, (int)((45 - angle)*spd/45), angle);
-//       break;
-
-//     case 8:
-//       digitalWrite(M1,HIGH);
-//       digitalWrite(M2,HIGH);
-//       analogWrite(E1, spd);
-//       analogWrite(E2, (int)(angle)*spd/45);
-//       Serial.printf("case 8 | M1: HIGH, M2: LOW | E1: %d, E2: %d | angle: %.2f\n", spd, (int)((45 - angle)*spd/45), angle);
-//       break;
-
-//     default:
-//       Serial.printf("Error for direction | sector: %d | angle: %.2f\n", sector, angle);
-//   }
-//   server.send(200);
-// }

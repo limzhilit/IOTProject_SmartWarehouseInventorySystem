@@ -32,7 +32,7 @@
     --bg-secondary: #0a0a0a;
     --bg-tertiary: #1a1a1a;
     --bg-nav: rgba(51, 51, 51, 0.6);
-    --bg-nav-active: rgba(68, 68, 68, 0.8);
+    --bg-nav-active: rgba(0, 0, 0, 0.8);
     --bg-nav-hover: rgba(68, 68, 68, 0.5);
     --bg-button: rgba(51, 51, 51, 0.6);
     --bg-button-hover: rgba(68, 68, 68, 0.8);
@@ -60,7 +60,7 @@ body.dark-mode {
   --bg-secondary: #0a0a0a;
   --bg-tertiary: #1a1a1a;
   --bg-nav: rgba(51, 51, 51, 0.6);
-  --bg-nav-active: rgba(68, 68, 68, 0.8);
+  --bg-nav-active: rgba(0, 0, 0, 0.8);
   --bg-nav-hover: rgba(68, 68, 68, 0.5);
   --bg-button: rgba(51, 51, 51, 0.6);
   --bg-button-hover: rgba(68, 68, 68, 0.8);
@@ -370,12 +370,12 @@ button:active {
   width: 100px;
 }
 
-.addItem {
+.addItemSection {
   display: flex;
   flex-direction: row;
 }
 
-#addItemBtn,
+#addItem,
 #assignCardBtn {
   width: 150px;
 }
@@ -383,4 +383,18 @@ button:active {
 #charCount {
   color: var(--text-tertiary);
   margin-right: 10px;
+}
+
+.chart {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+}
+
+iframe {
+  border-radius: 10px;
+  border: none;
+  box-shadow: var(--shadow-md);
 }

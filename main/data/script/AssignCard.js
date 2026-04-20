@@ -1,100 +1,94 @@
-// CARD ASSIGNMENT UI
+import { ws } from './WebSocket.js';
 
-function resetAssignUI() {
-  document.getElementById("assignCardBtn").style.display = "block";
-  document.getElementById("waiting").style.display = "none";
-  document.getElementById("getName").style.display = "none";
-  document.getElementById("assign").style.display = "none";
-  document.getElementById("cancel").style.display = "none";
-}
+const $ = id => document.getElementById(id);
 
-resetAssignUI();
+// UI elements
+const assignBtn = $("assignCardBtn");
+const waiting = $("waiting");
+const cancel = $("cancel");
+const getName = $("getName");
+const assign = $("assign");
+const input = $("assignInput");
+const charCount = $("charCount");
+const timeout = $("timeout");
+const assigning = $("assigning");
 
-// ASSIGN ITEM TO CARD
-function assign() {
-  const itemName = document.getElementById("assignInput").value;
+const maxLen = 15;
 
-  if (itemName && itemName.trim() !== "") {
-    fetch(`/assign?item=${encodeURIComponent(itemName.substring(0, 16))}`)
-      .then(res => res.text())
-      .then(msg => {
-        alert(msg);
-        resetAssignUI();
-      })
-      .catch(err => {
-        console.error("Assign failed:", err);
-        resetAssignUI();
-      });
-  } else {
-    alert("Assignment cancelled (no name provided).");
-    resetAssignUI();
+// ----------------- Helpers -----------------
+const show = (el, visible = true) => el && (el.style.display = visible ? "block" : "none");
+
+const reset = () => {
+  show(assignBtn);
+  show(waiting, false);
+  show(cancel, false);
+  show(getName, false);
+  show(assign, false);
+  show(timeout, false)
+  show(assigning, false)
+};
+
+const updateCharCount = () => {
+  if (!input || !charCount) return;
+  const len = input.value.length;
+  charCount.textContent = `${len} / ${maxLen}`;
+  charCount.style.color = len === maxLen ? "red" : "gray";
+};
+
+const assignItem = () => {
+  if (!input) return;
+  const item = input.value.trim().substring(0, maxLen);
+  if (!item) {
+    console.log("No item name provided");
+    return;
   }
+  ws.send(JSON.stringify({ type: "assign", item }));
+  show(getName, false);
+  show(assign, false);
+  show(cancel, false);
+  show(assigning);
+
+};
+
+export const assignSuccessful = () => {
+
+  reset();
+};
+
+const startWaiting = () => {
+  show(assignBtn, false);
+  show(waiting);
+  show(cancel);
+  ws.send(JSON.stringify({ type: "assignCard" }));
+};
+
+const cancelAssignCard = () => {
+  ws.send(JSON.stringify({ type: "cancelAssignCard" }));
+  reset();
+};
+
+export const cardTimeout = () => {
+  show(timeout, true);
+  show(waiting, false);
+  setTimeout(() => {
+    reset();
+  }, 2000); // 2000 ms = 2 seconds
+};
+
+// ----------------- WebSocket Message Handler -----------------
+export function handleAssignCard(msg) {
+  show(getName);
+  show(assign);
+  show(waiting, false);
 }
 
+// ----------------- Event Listeners -----------------
+// check if the element exists before adding event listener
+assignBtn?.addEventListener("click", startWaiting);
+cancel?.addEventListener("click", cancelAssignCard);
+assign?.addEventListener("click", assignItem);
+input?.addEventListener("input", updateCharCount);
 
-// CHARACTER COUNTER
-const assignInput = document.getElementById("assignInput");
-const charCount = document.getElementById("charCount");
-const maxLen = assignInput.maxLength;
-
-assignInput.addEventListener("input", () => {
-  const length = assignInput.value.length;
-  charCount.textContent = `${length} / ${maxLen}`;
-  charCount.style.color = length === maxLen ? "red" : "gray";
-});
-
-
-// WAIT FOR CARD
-function assignCard() {
-  let assignCancelled = false;
-
-  // Update UI
-  document.getElementById("assignCardBtn").style.display = "none";
-  document.getElementById("waiting").style.display = "block";
-  document.getElementById("cancel").style.display = "block";
-
-  const cancelBtn = document.getElementById("cancel");
-
-  const onCancel = () => {
-    assignCancelled = true;
-    resetAssignUI();
-  };
-
-  cancelBtn.addEventListener("click", onCancel);
-
-  fetch("/waitForCard")
-    .then(waitResponse => waitResponse.text())
-    .then(waitText => {
-      if (assignCancelled) return;
-
-      if (waitText.includes("detected")) {
-        // Card detected → ask for name
-        document.getElementById("assign").style.display = "block";
-        document.getElementById("waiting").style.display = "none";
-        document.getElementById("getName").style.display = "block";
-
-        document
-          .getElementById("assign")
-          .addEventListener("click", assign);
-      } else {
-        // No card detected
-        document.getElementById("cancel").style.display = "none";
-        document.getElementById("waiting").textContent = "No card detected.";
-
-        setTimeout(() => {
-          resetAssignUI();
-          document.getElementById("waiting").textContent =
-            "Waiting for card...";
-        }, 10000);
-      }
-    })
-    .catch(err => {
-      console.error("Wait for card failed:", err);
-      resetAssignUI();
-    })
-    .finally(() => {
-      cancelBtn.removeEventListener("click", onCancel);
-    });
-}
-
-document.getElementById("assignCardBtn").addEventListener("click", assignCard);
+// ----------------- Init -----------------
+reset();
+updateCharCount();

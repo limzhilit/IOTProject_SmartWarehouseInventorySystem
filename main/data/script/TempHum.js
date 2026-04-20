@@ -1,16 +1,22 @@
-// ==========================
-// FETCH TEMPERATURE & HUMIDITY
-// ==========================
+// TEMPERATURE & HUMIDITY via WebSocket
 
-function fetchTempHum() {
-  fetch("/temphum")
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById("temp").textContent = data.temperature;
-      document.getElementById("hum").textContent = data.humidity;
-    });
+// Listens for { type:"tempHum", temperature:..., humidity:... } messages
+// from the shared WebSocket defined in AssignCard.js (window.ws).
+
+// When the WebSocket receives a message from the server, run this function.
+
+export function handleTempHum(msg) {
+  // Convert to numbers if they are strings
+  const temp = parseFloat(msg.temp);
+  const hum = parseFloat(msg.hum);
+
+  // Check if conversion worked
+  if (isNaN(temp) || isNaN(hum)) {
+    console.warn("Invalid tempHum payload:", msg);
+    return;
+  }
+
+  // Update DOM
+  document.getElementById("temp").textContent = temp;
+  document.getElementById("hum").textContent = hum;
 }
-
-// Update every 2 seconds
-setInterval(fetchTempHum, 2000);
-fetchTempHum();

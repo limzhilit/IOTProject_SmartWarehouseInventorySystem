@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rover</title>
+  <link rel="stylesheet" href="/rover/rover.css">
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="#" class="active">Rover</a></li>
+    </ul>
+    <button id="themeToggle" aria-label="Toggle theme">
+      <span id="themeIcon"></span>
+    </button>
+  </nav>
+  <h1>Rover Manual Takeover</h1>
+
+  <div id="controller">
+    <div id="radial">
+      <div id="knob"></div>
+    </div>
+  </div>
+
+  <p>Direction: <span id="angleDisplay">0°</span></p>
+  <p>Speed: <span id="speedDisplay">0</span>%</p>
+
+  <script src="../script/ThemeToggle.js"></script>
+  <script src="/rover/rover.js"></script>
+
+</body>
+
+</html>

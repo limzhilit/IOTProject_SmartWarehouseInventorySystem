@@ -1,3 +1,6 @@
+const protocol = location.protocol === "https:" ? "wss" : "ws";
+const ws = new WebSocket(`${protocol}://${location.host}/ws`);
+
 let lastSend = 0;
 const SEND_INTERVAL = 120; // ms
 
@@ -32,8 +35,8 @@ function endDrag() {
   document.getElementById("angleDisplay").textContent = "0°";
   document.getElementById("speedDisplay").textContent = "0";
 
-  sendToRover(0, 0); // stop the rover
-  setTimeout(() => sendToRover(0, 0), SEND_INTERVAL); // ensure stop signal
+  sendData(0, 0); // stop the rover
+  setTimeout(() => sendData(0, 0), SEND_INTERVAL); // ensure stop signal
 }
 
 function resetKnob() {
@@ -41,19 +44,34 @@ function resetKnob() {
   knob.style.top = "50%";
 }
 
-let ws = new WebSocket("ws://" + location.hostname + ":81/");
-
 ws.onopen = () => {
   console.log("Connected");
 };
 
+ws.onerror = (err) => {
+  console.error("WebSocket error", err);
+};
+
+
+
 function sendData(dir, spd) {
-  ws.send(dir + "," + spd);
+  const msg = JSON.stringify({ type: "rover", dir, spd });
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(msg);
+    console.log("Sent:", msg);
+  } else {
+    console.warn("WebSocket not ready, message queued:", msg);
+  }
 }
 
 function handleDrag(e) {
   if (!dragging) return;
   e.preventDefault();
+
+  const now = Date.now();
+  if (now - lastSend < SEND_INTERVAL) return; // throttle
+  lastSend = now;
+
 
   const rect = radial.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
@@ -87,11 +105,9 @@ function handleDrag(e) {
   document.getElementById("angleDisplay").textContent = `${Math.round(degrees)}°`;
   document.getElementById("speedDisplay").textContent = Math.round(distance / 255 * 100);
 
-  console.log(`Degrees: ${degrees.toFixed(2)}, Distance: ${distance.toFixed(2)}`);
-  sendData(degrees, distance);
-}
-
-function fetchIndex() {
-  fetch("/").catch(err => console.error(err));
+  // console.log(`Degrees: ${degrees.toFixed(2)}, Distance: ${distance.toFixed(2)}`);
+  const degreesInt = Math.round(degrees);
+  const speedInt = Math.round(distance);
+  sendData(degreesInt, speedInt);
 }
 

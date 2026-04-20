@@ -53,27 +53,36 @@
   </table>
 
   <div class="assignDiv">
-    <p id="waiting" class="waiting">Please place your card on the reader<span class="dots"></span></p>
+    <p id="timeout" class="timeout">Timeout</p>
+    <p id="assigning" class="assigning">Assigning<span class="dots"></span></p>
+
+    <p id="waiting" class="waiting">Waiting for card<span class="dots"></span></p>
     <div id="getName">
       <input type="text" id="assignInput" placeholder="Enter item name" maxlength="16">
-      <small id="charCount">0 / 16</small>
+      <small id="charCount">0 / 15</small>
     </div>
     <button id="assignCardBtn">Assign Card</button>
-    <button id="assign" onClick="assign">Assign</button>
-    <button id="cancel" onClick="cancel">Cancel</button>
+    <button id="assign">Assign</button>
+    <button id="cancel">Cancel</button>
   </div>
 
-  <div class="addItem">
-    <button id="addItemBtn">Add Item</button>
-    <p id="waiting2" class="waiting">Please place your card on the reader<span class="dots"></span></p>
-    <button id="cancel2">Cancel</button>
+  <div class="addItemSection">
+    <button id="addItem">Add Item</button>
+    <p id="waitingAddItem" class="waiting" style="display: none;">Waiting for card<span class="dots"></span></p>
+    <button id="cancelAddItem" style="display: none;">Cancel</button>
   </div>
 
-  <script src="/script/ThemeToggle.js"></script>
-  <script src="/script/Table.js" defer></script>
-  <script src="/script/AssignCard.js"></script>
-  <script src="/script/TempHum.js"></script>
+  <div class="chart">
+    <iframe width="450" height="260"
+      src="https://thingspeak.com/channels/3350017/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15">
+    </iframe>
 
+    <iframe width="450" height="260"
+      src="https://thingspeak.com/channels/3350017/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15">
+    </iframe>
+  </div>
+
+  <script type="module" src="script/Main.js"></script>
 </body>
 
 </html>
