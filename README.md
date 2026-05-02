@@ -33,7 +33,7 @@ By integrating RFID technology, embedded systems, and web-based control, the sys
 ---
 
  🏗️ System Architecture
-
+```
 [RFID]        [Temperature Sensor]
      \             /
       \           /
@@ -43,7 +43,7 @@ By integrating RFID technology, embedded systems, and web-based control, the sys
                  [Motor Control]
                       ↓
                  [Robotic Cart]
-
+```
 ---
 
  🧠 Technologies Used
@@ -162,7 +162,7 @@ This project contributes to:
 
  📂 Project Structure
 
-
+```
 /src
   ├── esp32_code.ino
 /web
@@ -172,7 +172,7 @@ This project contributes to:
 /docs
   ├── report.pdf
 README.md
-
+```
 
 ---
 
