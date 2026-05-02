@@ -1,6 +1,4 @@
-Here’s a clean, professional GitHub README.md for your IoT Warehouse System. You can paste this directly into your repo.
 
----
 
  🏭 Intelligent Warehouse Automation System
 
